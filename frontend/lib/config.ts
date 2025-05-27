@@ -15,4 +15,5 @@ export const FEATURES = {
 export const APP_CONFIG = {
   APP_NAME: 'Open Deep Research',
   APP_DESCRIPTION: 'Technical Due Diligence Platform powered by AI agents',
+  API_BASE_URL: API_BASE_URL,
 };

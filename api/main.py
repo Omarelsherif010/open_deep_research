@@ -1,7 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 import sys
 from pathlib import Path
+import os
 
 # Add the parent directory to sys.path to allow relative imports
 parent_dir = str(Path(__file__).parent.parent)
@@ -9,7 +11,7 @@ if parent_dir not in sys.path:
     sys.path.append(parent_dir)
 
 # Import routers
-from routers import projects
+from routers import projects, documents
 
 app = FastAPI(title="Open Deep Research API", 
               description="API for Technical Due Diligence with AI agents",
@@ -26,6 +28,14 @@ app.add_middleware(
 
 # Include routers
 app.include_router(projects.router)
+app.include_router(documents.router)
+
+# Create uploads directory if it doesn't exist
+uploads_dir = Path("uploads")
+uploads_dir.mkdir(exist_ok=True)
+
+# Mount the uploads directory for serving files
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 
 @app.get("/")
 async def root():

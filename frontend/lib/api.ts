@@ -14,6 +14,19 @@ export class ApiError extends Error {
 }
 
 /**
+ * Document interface
+ */
+export interface Document {
+  id: string;
+  filename: string;
+  project_id: string;
+  content_type: string;
+  size: number;
+  upload_date: string;
+  path: string;
+}
+
+/**
  * Handle API response and throw appropriate errors
  */
 async function handleResponse(response: Response, errorPrefix: string) {
@@ -86,6 +99,60 @@ export async function getProject(projectId: string) {
     return handleResponse(response, 'Failed to fetch project');
   } catch (error) {
     console.error('Error in getProject:', error);
+    throw error;
+  }
+}
+
+/**
+ * Upload a document for a project
+ */
+export async function uploadDocument(file: File, projectId: string, description?: string) {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('project_id', projectId);
+    
+    if (description) {
+      formData.append('description', description);
+    }
+    
+    const response = await fetch(`${API_BASE_URL}/api/documents/upload`, {
+      method: 'POST',
+      body: formData,
+      // Don't set Content-Type header, it will be set automatically with boundary
+    });
+    
+    return handleResponse(response, 'Failed to upload document');
+  } catch (error) {
+    console.error('Error in uploadDocument:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get all documents for a project
+ */
+export async function getProjectDocuments(projectId: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/documents/${projectId}`);
+    return handleResponse(response, 'Failed to fetch project documents');
+  } catch (error) {
+    console.error('Error in getProjectDocuments:', error);
+    throw error;
+  }
+}
+
+/**
+ * Delete a document
+ */
+export async function deleteDocument(projectId: string, documentId: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/documents/${projectId}/${documentId}`, {
+      method: 'DELETE',
+    });
+    return handleResponse(response, 'Failed to delete document');
+  } catch (error) {
+    console.error('Error in deleteDocument:', error);
     throw error;
   }
 }
